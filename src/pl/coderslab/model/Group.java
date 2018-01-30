@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import pl.coderslab.util.DbUtil;
+
 public class Group {
 
 	public static void main(String[] args) {
@@ -37,83 +39,109 @@ public class Group {
 		this.id = id;
 	}
 
-	public static void createTable(Connection conn) {
+	public static void createTable() {
 		String query = "CREATE TABLE Groups(\n" + 
 				"	id INT AUTO_INCREMENT,\n" + 
 				"    name VARCHAR(255) NOT NULL,\n" + 
 				"    PRIMARY KEY(id)\n" + 
 				");";
 		
-		try {
-			PreparedStatement stm = conn.prepareStatement(query);
+		try (Connection conn = DbUtil.getConn();
+				PreparedStatement stm = conn.prepareStatement(query)) {
 			stm.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Nie można utworzyć tabeli Groups");
 		}
 	}
 	
-	public void saveToDB(Connection conn) throws SQLException {
+	public void saveToDB() {
 		if	(this.id == 0) {
 			String sql = "INSERT INTO Groups(name) VALUES (?)";
 			String generatedColumns[] = { "ID" };
-			PreparedStatement preparedStatement;
-			preparedStatement = conn.prepareStatement(sql, generatedColumns);
-			preparedStatement.setString(1, this.name);
-			preparedStatement.executeUpdate();
-			ResultSet rs = preparedStatement.getGeneratedKeys();
-			if (rs.next())	{
-				this.id	= rs.getInt(1);
+			try (Connection conn = DbUtil.getConn();
+					PreparedStatement preparedStatement = conn.prepareStatement(sql, generatedColumns)) {
+				preparedStatement.setString(1, this.name);
+				preparedStatement.executeUpdate();
+				
+				try (ResultSet rs = preparedStatement.getGeneratedKeys();) {
+					if (rs.next())	{
+						this.id	= rs.getInt(1);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
 		} else {
 			String sql = "UPDATE Groups SET name = ? where id = ?";
-			PreparedStatement preparedStatement;
-			preparedStatement = conn.prepareStatement(sql);
-			preparedStatement.setString(1, this.name);
-			preparedStatement.setInt(2, this.id);
-			preparedStatement.executeUpdate();
+			try (Connection conn = DbUtil.getConn();
+					PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+				preparedStatement.setString(1, this.name);
+				preparedStatement.setInt(2, this.id);
+				preparedStatement.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public static Group loadById(Connection conn, int id) throws SQLException {
-			String sql = "SELECT * FROM Groups WHERE id = ?";
-			PreparedStatement preparedStatement;
-			preparedStatement = conn.prepareStatement(sql);
+	public static Group loadById(int id) {
+		String sql = "SELECT * FROM Groups WHERE id = ?";
+		try (Connection conn = DbUtil.getConn();
+				PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
 			preparedStatement.setInt(1, id);
-			ResultSet resultSet = preparedStatement.executeQuery();;
-			if (resultSet.next()) {
-				Group loadedGroup = new Group();
-				loadedGroup.id = resultSet.getInt("id");
-				loadedGroup.name = resultSet.getString("name");
-				return loadedGroup;
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				if (resultSet.next()) {
+					Group loadedGroup = new Group();
+					loadedGroup.id = resultSet.getInt("id");
+					loadedGroup.name = resultSet.getString("name");
+					return loadedGroup;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			return null;
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
+		return null;
+	}
 	
-	static public Group[] loadAllGroups(Connection conn) throws SQLException {
+	static public Group[] loadAllGroups() {
 		ArrayList<Group> groups = new ArrayList<Group>();
 		String sql = "SELECT * FROM Groups";
-		PreparedStatement preparedStatement;
-		preparedStatement = conn.prepareStatement(sql);
-		ResultSet resultSet = preparedStatement.executeQuery();
-		while (resultSet.next()) {
-			Group loadedGroup = new Group();
-			loadedGroup.id = resultSet.getInt("id");
-			loadedGroup.name = resultSet.getString("name");
-			groups.add(loadedGroup);
+		try (Connection conn = DbUtil.getConn();
+				PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+			
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				while (resultSet.next()) {
+					Group loadedGroup = new Group();
+					loadedGroup.id = resultSet.getInt("id");
+					loadedGroup.name = resultSet.getString("name");
+					groups.add(loadedGroup);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		Group[] gArray = new Group[groups.size()]; 
 		gArray = groups.toArray(gArray);
 		return gArray;
 	}
 	
-	public void delete(Connection conn) throws SQLException {
+	public void delete() {
 		if (this.id != 0) {
 			String sql = "DELETE FROM Groups WHERE id = ?";
-			PreparedStatement preparedStatement;
-			preparedStatement = conn.prepareStatement(sql);
-			preparedStatement.setInt(1, this.id);
-			preparedStatement.executeUpdate();
-			this.id = 0;
+			try (Connection conn = DbUtil.getConn();
+					PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+				preparedStatement.setInt(1, this.id);
+				preparedStatement.executeUpdate();
+				this.id = 0;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

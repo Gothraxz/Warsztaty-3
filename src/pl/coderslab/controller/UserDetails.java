@@ -51,14 +51,11 @@ public class UserDetails extends HttpServlet {
 			id = Integer.parseInt(idString);
 			
 			if (Utils.userExists(users, id)) {
-				try {
-					User user = User.loadById(DbUtil.getConn(), id);
-					session.setAttribute("user", user);
-					Solution[] solutions = Exercise.loadAllByUserId(DbUtil.getConn(), id);
-					session.setAttribute("userSolutions", solutions);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+				User user = User.loadById(id);
+				session.setAttribute("user", user);
+				Solution[] solutions = Exercise.loadAllByUserId(id);
+				session.setAttribute("userSolutions", solutions);
+
 				request.getRequestDispatcher("/WEB-INF/UserDetails.jsp").forward(request, response);
 				
 			} else {

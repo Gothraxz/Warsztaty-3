@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import pl.coderslab.util.DbUtil;
+
 public class User {
 
 	public static void main(String[] args) {
@@ -69,7 +71,7 @@ public class User {
 		this.group = group;
 	}
 	
-	public static void createTable(Connection conn) {
+	public static void createTable() {
 		String query = "CREATE TABLE Users(\n" + 
 				"	id BIGINT AUTO_INCREMENT,\n" + 
 				"    username VARCHAR(255),\n" + 
@@ -80,102 +82,132 @@ public class User {
 				"    FOREIGN KEY(group_id) REFERENCES Groups(id)\n" + 
 				");";
 		
-		try {
-			PreparedStatement stm = conn.prepareStatement(query);
+		try (Connection conn = DbUtil.getConn();
+				PreparedStatement stm = conn.prepareStatement(query)){
 			stm.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Nie można utworzyć tabeli Users.");
 		}
 	}
 	
-	public void saveToDB(Connection conn) throws SQLException {
+	public void saveToDB() {
 		if	(this.id == 0) {
 			String sql = "INSERT INTO Users(username, email, password, group_id) VALUES (?, ?, ?, ?)";
 			String generatedColumns[] = { "ID" };
-			PreparedStatement preparedStatement;
-			preparedStatement = conn.prepareStatement(sql, generatedColumns);
-			preparedStatement.setString(1, this.username);
-			preparedStatement.setString(2, this.email);
-			preparedStatement.setString(3, this.password);
-			preparedStatement.setInt(4, this.group.getId());
-			preparedStatement.executeUpdate();
-			ResultSet rs = preparedStatement.getGeneratedKeys();
-			if (rs.next())	{
-				this.id	= rs.getInt(1);
+			try (Connection conn = DbUtil.getConn();
+					PreparedStatement preparedStatement = conn.prepareStatement(sql, generatedColumns)) {
+				preparedStatement.setString(1, this.username);
+				preparedStatement.setString(2, this.email);
+				preparedStatement.setString(3, this.password);
+				preparedStatement.setInt(4, this.group.getId());
+				preparedStatement.executeUpdate();
+				try (ResultSet rs = preparedStatement.getGeneratedKeys()) {
+					if (rs.next())	{
+						this.id	= rs.getInt(1);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
 		} else {
 			String sql = "UPDATE Users SET username = ?, email = ?, password = ?, group_id = ? where id = ?";
-			PreparedStatement preparedStatement;
-			preparedStatement = conn.prepareStatement(sql);
-			preparedStatement.setString(1, this.username);
-			preparedStatement.setString(2, this.email);
-			preparedStatement.setString(3, this.password);
-			preparedStatement.setInt(4, this.group.getId());
-			preparedStatement.setInt(5, this.id);
-			preparedStatement.executeUpdate();
+			try (Connection conn = DbUtil.getConn();
+					PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+				preparedStatement.setString(1, this.username);
+				preparedStatement.setString(2, this.email);
+				preparedStatement.setString(3, this.password);
+				preparedStatement.setInt(4, this.group.getId());
+				preparedStatement.setInt(5, this.id);
+				preparedStatement.executeUpdate();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public static User loadById(Connection conn, int id) throws SQLException {
+	public static User loadById(int id) {
 		String sql = "SELECT * FROM Users WHERE id = ?";
-		PreparedStatement preparedStatement;
-		preparedStatement = conn.prepareStatement(sql);
-		preparedStatement.setInt(1, id);
-		ResultSet resultSet = preparedStatement.executeQuery();;
-		if (resultSet.next()) {
-			User loadedUser = new User();
-			loadedUser.id = resultSet.getInt("id");
-			loadedUser.username = resultSet.getString("username");
-			loadedUser.email = resultSet.getString("email");
-			loadedUser.password = resultSet.getString("password");
-			loadedUser.group = Group.loadById(conn, resultSet.getInt("group_id"));
-			return loadedUser;
+		try (Connection conn = DbUtil.getConn();
+				PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+			preparedStatement.setInt(1, id);
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				if (resultSet.next()) {
+					User loadedUser = new User();
+					loadedUser.id = resultSet.getInt("id");
+					loadedUser.username = resultSet.getString("username");
+					loadedUser.email = resultSet.getString("email");
+					loadedUser.password = resultSet.getString("password");
+					loadedUser.group = Group.loadById(resultSet.getInt("group_id"));
+					return loadedUser;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
 	
-	static public User[] loadAllUsers(Connection conn) throws SQLException {
+	static public User[] loadAllUsers() {
 		ArrayList<User> users = new ArrayList<User>();
 		String sql = "SELECT * FROM Users";
-		PreparedStatement preparedStatement;
-		preparedStatement = conn.prepareStatement(sql);
-		ResultSet resultSet = preparedStatement.executeQuery();
-		while (resultSet.next()) {
-			User loadedUser = new User();
-			loadedUser.id = resultSet.getInt("id");
-			loadedUser.username = resultSet.getString("username");
-			loadedUser.password = resultSet.getString("password");
-			loadedUser.email = resultSet.getString("email");
-			loadedUser.group = Group.loadById(conn, resultSet.getInt("group_id"));
-			users.add(loadedUser);
+		try (Connection conn = DbUtil.getConn();
+				PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				while (resultSet.next()) {
+					User loadedUser = new User();
+					loadedUser.id = resultSet.getInt("id");
+					loadedUser.username = resultSet.getString("username");
+					loadedUser.password = resultSet.getString("password");
+					loadedUser.email = resultSet.getString("email");
+					loadedUser.group = Group.loadById(resultSet.getInt("group_id"));
+					users.add(loadedUser);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		User[] uArray = new User[users.size()]; 
 		uArray = users.toArray(uArray);
 		return uArray;
 	}
 	
-	public void delete(Connection conn) throws SQLException {
+	public void delete() {
 		if (this.id != 0) {
 			String sql = "DELETE FROM Users WHERE id = ?";
-			PreparedStatement preparedStatement;
-			preparedStatement = conn.prepareStatement(sql);
-			preparedStatement.setInt(1, this.id);
-			preparedStatement.executeUpdate();
-			this.id = 0;
+			try (Connection conn = DbUtil.getConn();
+					PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+				preparedStatement.setInt(1, this.id);
+				preparedStatement.executeUpdate();
+				this.id = 0;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public static User[] loadAllByGrupId(Connection conn, int id) throws SQLException {
+	public static User[] loadAllByGrupId(int id) {
 		ArrayList<User> solution = new	ArrayList<>();
 		String sql = "SELECT * FROM Users WHERE group_id=?;";
-		PreparedStatement preparedStatement;
-		preparedStatement = conn.prepareStatement(sql);
-		preparedStatement.setInt(1, id);
-		ResultSet resultSet = preparedStatement.executeQuery();
-		while (resultSet.next()) {
-			User loadedUser = new User();
-			loadedUser = User.loadById(conn, resultSet.getInt("id"));
-			solution.add(loadedUser);
+		try (Connection conn = DbUtil.getConn();
+				PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+			preparedStatement.setInt(1, id);
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				while (resultSet.next()) {
+					User loadedUser = new User();
+					loadedUser = User.loadById(resultSet.getInt("id"));
+					solution.add(loadedUser);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		User[] uArray = new User[solution.size()];	
 		uArray = solution.toArray(uArray);

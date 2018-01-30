@@ -50,13 +50,9 @@ public class GroupUsers extends HttpServlet {
 			id = Integer.parseInt(idString);
 			
 			if (Utils.groupExists(groups, id)) {
-				try {
-					User[] users = User.loadAllByGrupId(DbUtil.getConn(), id);
-					session.setAttribute("users", users);
-					
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+				User[] users = User.loadAllByGrupId(id);
+				session.setAttribute("users", users);
+				
 				request.getRequestDispatcher("/WEB-INF/GroupUsers.jsp").forward(request, response);
 				
 			} else {

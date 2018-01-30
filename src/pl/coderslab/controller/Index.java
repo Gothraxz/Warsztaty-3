@@ -45,12 +45,8 @@ public class Index extends HttpServlet {
 		int numberSolutions = Integer.parseInt(request.getServletContext()
 				.getInitParameter("number-solutions"));
 		
-		Solution[] solutionsLimitedList = null;
-		try {
-			solutionsLimitedList = Solution.loadAllSolutions(DbUtil.getConn(), numberSolutions);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		Solution[] solutionsLimitedList = Solution.loadAllSolutions(numberSolutions);
+		
 		
 		session.setAttribute("solutionsLimitedList", solutionsLimitedList);
 		request.getRequestDispatcher("WEB-INF/index.jsp").forward(request, response);
@@ -67,28 +63,22 @@ public class Index extends HttpServlet {
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
 		
-		
-		
 	}
 	
 	private User[] getUsers() {
-		try {
-			return User.loadAllUsers(DbUtil.getConn());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return new User[0];
+		
+		if (User.loadAllUsers() != null) {
+			return User.loadAllUsers();
 		}
+		return new User[0];
 	}
 	
 	private Solution[] getSolutions(int i) {
 		
-		try {
-			return Solution.loadAllSolutions(DbUtil.getConn(), i);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return new Solution[0];
+		if (Solution.loadAllSolutions(i) != null) {
+			return Solution.loadAllSolutions(i);
 		}
-		
+		return new Solution[0];
 	}
 
 }

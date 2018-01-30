@@ -49,13 +49,9 @@ public class SolutionDetails extends HttpServlet {
 			id = Integer.parseInt(idString);
 			
 			if (Utils.solutionExists(solutions, id)) {
-				try {
-					Solution solution = Solution.loadById(DbUtil.getConn(), id);
-					session.setAttribute("solution", solution);
-					
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
+				Solution solution = Solution.loadById(id);
+				session.setAttribute("solution", solution);
+				
 				request.getRequestDispatcher("/WEB-INF/SolutionDetails.jsp").forward(request, response);
 				
 			} else {

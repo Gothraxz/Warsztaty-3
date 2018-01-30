@@ -40,12 +40,7 @@ public class AllGroups extends HttpServlet {
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
 		
-		Group[] allGroups = null;
-		try {
-			allGroups = Group.loadAllGroups(DbUtil.getConn());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		Group[] allGroups = Group.loadAllGroups();
 		
 		if (allGroups == null ) {
 			writer

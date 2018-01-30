@@ -1,8 +1,7 @@
-package pl.coderslab.controller;
+package pl.coderslab.panel;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,21 +10,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import pl.coderslab.model.Solution;
-import pl.coderslab.util.DbUtil;
-import pl.coderslab.util.Utils;
+import pl.coderslab.model.Group;
 
 /**
- * Servlet implementation class UserSolutionDetails
+ * Servlet implementation class GroupAdmin
  */
-@WebServlet("/UserSolutionDetails")
-public class UserSolutionDetails extends HttpServlet {
+@WebServlet("/GroupAdmin")
+public class GroupAdmin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public UserSolutionDetails() {
+    public GroupAdmin() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -34,38 +31,24 @@ public class UserSolutionDetails extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html");
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
 		
-		String idString = request.getParameter("id");
-		int id = 0;
-		
-		Solution[] solutions = Solution.loadAllSolutions();
-		
-		if (Utils.isNumeric(idString)) {
-			id = Integer.parseInt(idString);
-			
-			if (Utils.solutionExists(solutions, id)) {
-				Solution solution = Solution.loadById(id);
-				session.setAttribute("solution", solution);
-				
-				request.getRequestDispatcher("/WEB-INF/SolutionDetails.jsp").forward(request, response);
-				
-			} else {
-				writer
-				.append("Id doesn't exist!<br>")
-				.append("<a href='" + request.getContextPath() 
-				+ "' link='red'>Return to main site</a>");
-			}
-		} else {
+		Group[] groups = Group.loadAllGroups();
+
+		if (groups == null ) {
 			writer
-			.append("Id must be a number!<br>")
+			.append("There aren't any groups!<br>")
 			.append("<a href='" + request.getContextPath() 
-			+ "' link='red'>Return to main site</a><br>");
+			+ "' link='red'>Return to main site</a>");
+		} else {
+			session.setAttribute("groups", groups);
+			request.getRequestDispatcher("/WEB-INF/panel/GroupList.jsp")
+			.forward(request, response);
 		}
 		
 	}
@@ -80,7 +63,6 @@ public class UserSolutionDetails extends HttpServlet {
 		response.setContentType("text/html");
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
-
 		
 	}
 
