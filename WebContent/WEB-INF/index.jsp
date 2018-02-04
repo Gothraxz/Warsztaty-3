@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>W3</title>
+<title>W3 main site</title>
 </head>
 <%@include file="/WEB-INF/fragments/header.jspf" %>
 <body>

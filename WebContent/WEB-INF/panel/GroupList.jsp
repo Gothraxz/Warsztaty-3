@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Group List</title>
 </head>
 <%@include file="/WEB-INF/fragments/header.jspf" %>
 <body>
@@ -28,7 +28,7 @@
 </c:forEach>
 </table>
 <br><br>
-<a href="panel/GroupForm?id=0">Add new</a>
+<a href="GroupForm?id=0">Add new</a>
 <br><br>
 </body>
 <%@include file="/WEB-INF/fragments/footer.jspf" %>

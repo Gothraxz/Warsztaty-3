@@ -5,14 +5,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Group Form</title>
 </head>
 <%@include file="/WEB-INF/fragments/header.jspf" %>
 <body>
 
-	<form action="/GroupList" method="post">
+	<form action="GroupAdmin" method="post">
 		Group name:<br>
-		<input type="text" name="name"><br>
+		<input type="text" name="groupName"><br>
 		<input type="submit" value="Submit">
 	</form>
 

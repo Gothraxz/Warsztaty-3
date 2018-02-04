@@ -10,19 +10,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import pl.coderslab.model.Group;
+import pl.coderslab.util.Utils;
 
 /**
- * Servlet implementation class GroupAdmin
+ * Servlet implementation class GroupForm
  */
-@WebServlet("/GroupAdmin")
-public class GroupAdmin extends HttpServlet {
+@WebServlet("/GroupForm")
+public class GroupForm extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GroupAdmin() {
+    public GroupForm() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -37,20 +37,25 @@ public class GroupAdmin extends HttpServlet {
 		response.setContentType("text/html");
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
-		
-		Group[] groups = Group.loadAllGroups();
 
-		if (groups == null ) {
-			writer
-			.append("There aren't any groups!<br>")
-			.append("<a href='" + request.getContextPath() 
-			+ "' link='red'>Return to main site</a>");
+		String idString = request.getParameter("id");
+		int id = 0;
+		if (Utils.isNumeric(idString)) {
+			id = Integer.parseInt(idString);
+			if (id < 0) {
+				writer.append("Id must be positive value!<br>");
+				writer.append("<a href='GroupAdmin'>Return</a>");
+			} else {
+				session.setAttribute("groupId", idString);
+				request.getRequestDispatcher("/WEB-INF/panel/GroupForm.jsp")
+				.forward(request, response);
+			}
+			
 		} else {
-			session.setAttribute("groups", groups);
-			request.getRequestDispatcher("/WEB-INF/panel/GroupList.jsp")
-			.forward(request, response);
+			writer.append("Id must be a integer!<br>");
+			writer.append("<a href='GroupAdmin'>Return</a>");
+			
 		}
-		
 	}
 
 	/**
@@ -63,24 +68,7 @@ public class GroupAdmin extends HttpServlet {
 		response.setContentType("text/html");
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
-		
-		String groupId = (String) session.getAttribute("groupId");
-		String groupName = request.getParameter("groupName");
-		
-		int id = Integer.parseInt(groupId);
-		
-		Group group;
-		if (id == 0) {
-			group = new Group(groupName);
-			group.saveToDB();
-			doGet(request, response);
-		} else {
-			group = Group.loadById(id);
-			group.setName(groupName);
-			group.saveToDB();
-			doGet(request, response);
-		}
-		
+
 	}
 
 }
