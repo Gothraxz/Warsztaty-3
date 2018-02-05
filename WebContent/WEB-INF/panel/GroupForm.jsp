@@ -9,6 +9,7 @@
 </head>
 <%@include file="/WEB-INF/fragments/header.jspf" %>
 <body>
+<br>
 
 	<form action="GroupAdmin" method="post">
 		Group name:<br>

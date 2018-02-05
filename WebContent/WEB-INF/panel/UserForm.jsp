@@ -5,35 +5,25 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>User List</title>
+<title>User Form</title>
 </head>
 <%@include file="/WEB-INF/fragments/header.jspf" %>
 <body>
 <br>
 
-<table>
-<tr>
-<th>Id</th>
-<th>Name</th>
-<th>Email</th>
-<th>Group</th>
-<th></th>
-</tr>
-<c:forEach var="user" items="${users}">
-<tr>
-<td>${user.id}</td>
-<td>${user.username}</td>
-<td>${user.email}</td>
-<td>${user.group.id}</td>
-<td>
-<a href="UserForm?id=${user.id}&group=${user.group.id}">Edit</a>
-</td>
-</tr>
-</c:forEach>
-</table>
-<br><br>
-<a href="UserForm?id=0&group=0">Add new</a>
-<br><br>
+	<form action="UserAdmin" method="post">
+		User name:<br>
+		<input type="text" name="userName"><br>
+		User email:<br>
+		<input type="text" name="userEmail"><br>
+		Group id:<br>
+		<input type="text" name="groupId"><br>
+		User password:<br>
+		<input type="text" name="password"><br>
+		<input type="submit" value="Submit">
+	</form>
+
+	<br><br>
 </body>
 <%@include file="/WEB-INF/fragments/footer.jspf" %>
 </html>

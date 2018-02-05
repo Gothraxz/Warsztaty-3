@@ -11,18 +11,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import pl.coderslab.model.Group;
+import pl.coderslab.model.User;
 
 /**
- * Servlet implementation class GroupAdmin
+ * Servlet implementation class UserAdmin
  */
-@WebServlet("/GroupAdmin")
-public class GroupAdmin extends HttpServlet {
+@WebServlet("/UserAdmin")
+public class UserAdmin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GroupAdmin() {
+    public UserAdmin() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -38,19 +39,19 @@ public class GroupAdmin extends HttpServlet {
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
 		
-		Group[] groups = Group.loadAllGroups();
+		User[] users = User.loadAllUsers();
 
-		if (groups == null ) {
+		if (users == null ) {
 			writer
-			.append("There aren't any groups!<br>")
+			.append("There aren't any users!<br>")
 			.append("<a href='" + request.getContextPath() 
 			+ "' link='red'>Return to main site</a>");
 		} else {
-			session.setAttribute("groups", groups);
-			request.getRequestDispatcher("/WEB-INF/panel/GroupList.jsp")
+			session.setAttribute("users", users);
+			request.getRequestDispatcher("/WEB-INF/panel/UserList.jsp")
 			.forward(request, response);
 		}
-		
+
 	}
 
 	/**
@@ -64,27 +65,48 @@ public class GroupAdmin extends HttpServlet {
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
 		
-		String groupId = (String) session.getAttribute("groupId");
-		String groupName = request.getParameter("groupName");
+		String userId = (String) session.getAttribute("userId");
+		String userName = request.getParameter("userName");
+		String userEmail = request.getParameter("userEmail");
+		String groupId = request.getParameter("groupId");
+		String password = request.getParameter("password");
 		
-		int id = Integer.parseInt(groupId);
-		
-		Group group;
-		if (id == 0) {
-			group = new Group(groupName);
-			group.saveToDB();
-			doGet(request, response);
-		} else {
-			group = Group.loadById(id);
-			
-			if (groupId != null && groupId != "") {
-				group.setName(groupName);
-			}
-			
-			group.saveToDB();
-			doGet(request, response);
+		Group group = Group.loadById(0);
+		if (groupId != null && groupId != "") {
+			group = Group.loadById(Integer.parseInt(groupId));
 		}
 		
+		int id = Integer.parseInt(userId);
+		
+		User user;
+		if (id == 0) {
+			user = new User(userName, userEmail, group, password);
+			user.setPassword(password);
+			user.saveToDB();
+			doGet(request, response);
+		} else {
+			user = User.loadById(id);
+			
+			if (userName != null && userName != "") {
+				user.setUsername(userName);		
+			}
+			
+			if (userEmail != null && userEmail != "") {
+				user.setEmail(userEmail);
+			}
+			
+			if (groupId != null && groupId != "") {
+				user.setGroup(group);
+			}
+			
+			if (password != null && password != "") {
+				user.setPassword(password);
+			}
+		
+			user.saveToDB();
+			doGet(request, response);
+		}
+
 	}
 
 }

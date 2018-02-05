@@ -13,6 +13,8 @@
 
 <a href="GroupAdmin">Group administration</a>
 
+<a href="UserAdmin">User administration</a>
+
 <br><br>
 </body>
 <%@include file="/WEB-INF/fragments/footer.jspf" %>

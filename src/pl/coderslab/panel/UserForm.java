@@ -11,18 +11,19 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import pl.coderslab.model.Group;
+import pl.coderslab.util.Utils;
 
 /**
- * Servlet implementation class GroupAdmin
+ * Servlet implementation class UserForm
  */
-@WebServlet("/GroupAdmin")
-public class GroupAdmin extends HttpServlet {
+@WebServlet("/UserForm")
+public class UserForm extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GroupAdmin() {
+    public UserForm() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -37,20 +38,37 @@ public class GroupAdmin extends HttpServlet {
 		response.setContentType("text/html");
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
-		
-		Group[] groups = Group.loadAllGroups();
 
-		if (groups == null ) {
-			writer
-			.append("There aren't any groups!<br>")
-			.append("<a href='" + request.getContextPath() 
-			+ "' link='red'>Return to main site</a>");
-		} else {
-			session.setAttribute("groups", groups);
-			request.getRequestDispatcher("/WEB-INF/panel/GroupList.jsp")
-			.forward(request, response);
-		}
+		String idString = request.getParameter("id");
+		String groupString = request.getParameter("group");
+		int group = 0;
+		int id = 0;
 		
+		if (Utils.isNumeric(groupString) && Utils.isNumeric(idString)) {
+			id = Integer.parseInt(idString);
+			group = Integer.parseInt(groupString);
+			if (id < 0) {
+				writer.append("Id must be positive value!<br>");
+				writer.append("<a href='UserAdmin'>Return</a>");
+			} else {
+				Group[] groups = Group.loadAllGroups();
+				if (!Utils.groupExists(groups, group) && group != 0) {
+					writer.append("Group doesn't exist!<br>");
+					writer.append("<a href='UserAdmin'>Return</a>");
+				} else {
+					session.setAttribute("userId", idString);
+					session.setAttribute("groupId", groupString);
+					request.getRequestDispatcher("/WEB-INF/panel/UserForm.jsp")
+					.forward(request, response);	
+				}
+			}
+			
+		} else {
+			writer.append("Id must be a integer!<br>");
+			writer.append("<a href='UserAdmin'>Return</a>");
+		}	
+		
+
 	}
 
 	/**
@@ -63,28 +81,7 @@ public class GroupAdmin extends HttpServlet {
 		response.setContentType("text/html");
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
-		
-		String groupId = (String) session.getAttribute("groupId");
-		String groupName = request.getParameter("groupName");
-		
-		int id = Integer.parseInt(groupId);
-		
-		Group group;
-		if (id == 0) {
-			group = new Group(groupName);
-			group.saveToDB();
-			doGet(request, response);
-		} else {
-			group = Group.loadById(id);
-			
-			if (groupId != null && groupId != "") {
-				group.setName(groupName);
-			}
-			
-			group.saveToDB();
-			doGet(request, response);
-		}
-		
+
 	}
 
 }
