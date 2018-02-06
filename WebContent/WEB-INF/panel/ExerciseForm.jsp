@@ -5,19 +5,21 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Main panel</title>
+<title>Insert title here</title>
 </head>
 <%@include file="/WEB-INF/fragments/header.jspf" %>
 <body>
-<br><br>
+<br>
 
-<a href="GroupAdmin">Group administration</a>
-<br><br>
-<a href="UserAdmin">User administration</a>
-<br><br>
-<a href="ExerciseAdmin">Exercise administration</a>
+	<form action="ExerciseAdmin" method="post">
+		Exercise title:<br>
+		<input type="text" name="exerciseTitle"><br>
+		Exercise description:<br>
+		<input type="text" name="exerciseDescription"><br>
+		<input type="submit" value="Submit">
+	</form>
 
-<br><br>
+	<br><br>
 </body>
 <%@include file="/WEB-INF/fragments/footer.jspf" %>
 </html>

@@ -15,19 +15,22 @@
 <tr>
 <th>Id</th>
 <th>Title</th>
+<th>Description</th>
 <th></th>
 </tr>
 <c:forEach var="exercise" items="${exercises}">
 <tr>
 <td>${exercise.id}</td>
 <td>${exercise.title}</td>
+<td>${exercise.description}</td>
 <td>
-<a href="GroupUsers?id=${group.id}">Show users</a>
+<a href="ExerciseForm?id=${exercise.id}">Edit</a>
 </td>
 </tr>
 </c:forEach>
 </table>
-
+<br><br>
+<a href="ExerciseForm?id=0">Add new</a>
 <br><br>
 </body>
 <%@include file="/WEB-INF/fragments/footer.jspf" %>
