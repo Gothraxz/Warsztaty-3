@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import pl.coderslab.dao.GroupDao;
 import pl.coderslab.model.Group;
 
 /**
@@ -38,7 +39,7 @@ public class GroupAdmin extends HttpServlet {
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
 		
-		Group[] groups = Group.loadAllGroups();
+		Group[] groups = GroupDao.loadAllGroups();
 
 		if (groups == null ) {
 			writer
@@ -70,18 +71,19 @@ public class GroupAdmin extends HttpServlet {
 		int id = Integer.parseInt(groupId);
 		
 		Group group;
+		GroupDao gd = new GroupDao();
 		if (id == 0) {
 			group = new Group(groupName);
-			group.saveToDB();
+			gd.saveToDB(group);
 			doGet(request, response);
 		} else {
-			group = Group.loadById(id);
+			group = GroupDao.loadById(id);
 			
-			if (groupId != null && groupId != "") {
+			if (groupName != null && groupName != "") {
 				group.setName(groupName);
 			}
 			
-			group.saveToDB();
+			gd.saveToDB(group);
 			doGet(request, response);
 		}
 		

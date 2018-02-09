@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import pl.coderslab.dao.UserDao;
 import pl.coderslab.model.Group;
 import pl.coderslab.model.User;
 import pl.coderslab.util.DbUtil;
@@ -50,7 +51,7 @@ public class GroupUsers extends HttpServlet {
 			id = Integer.parseInt(idString);
 			
 			if (Utils.groupExists(groups, id)) {
-				User[] users = User.loadAllByGrupId(id);
+				User[] users = UserDao.loadAllByGrupId(id);
 				session.setAttribute("users", users);
 				
 				request.getRequestDispatcher("/WEB-INF/GroupUsers.jsp").forward(request, response);

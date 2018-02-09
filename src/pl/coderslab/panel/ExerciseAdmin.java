@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import pl.coderslab.dao.ExerciseDao;
 import pl.coderslab.model.Exercise;
 import pl.coderslab.model.Group;
 import pl.coderslab.model.User;
@@ -40,7 +41,7 @@ public class ExerciseAdmin extends HttpServlet {
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
 		
-		Exercise[] exercises = Exercise.loadAllExercises();
+		Exercise[] exercises = ExerciseDao.loadAllExercises();
 
 		if (exercises == null ) {
 			writer
@@ -72,14 +73,15 @@ public class ExerciseAdmin extends HttpServlet {
 		int id = Integer.parseInt(exerciseId);
 		
 		Exercise exercise;
+		ExerciseDao ed = new ExerciseDao();
 		if (id == 0) {
 			exercise = new Exercise(exerciseTitle, exerciseDescription);
 			exercise.setTitle(exerciseTitle);
 			exercise.setDescription(exerciseDescription);
-			exercise.saveToDB();
+			ed.saveToDB(exercise);
 			doGet(request, response);
 		} else {
-			exercise = Exercise.loadById(id);
+			exercise = ExerciseDao.loadById(id);
 			
 			if (exerciseTitle != null && exerciseTitle != "") {
 				exercise.setTitle(exerciseTitle);		
@@ -89,7 +91,7 @@ public class ExerciseAdmin extends HttpServlet {
 				exercise.setDescription(exerciseDescription);
 			}
 		
-			exercise.saveToDB();
+			ed.saveToDB(exercise);
 			doGet(request, response);
 		}
 

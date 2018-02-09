@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import pl.coderslab.dao.SolutionDao;
 import pl.coderslab.model.Solution;
 import pl.coderslab.util.DbUtil;
 import pl.coderslab.util.Utils;
@@ -44,13 +45,13 @@ public class UserSolutionDetails extends HttpServlet {
 		String idString = request.getParameter("id");
 		int id = 0;
 		
-		Solution[] solutions = Solution.loadAllSolutions();
+		Solution[] solutions = SolutionDao.loadAllSolutions();
 		
 		if (Utils.isNumeric(idString)) {
 			id = Integer.parseInt(idString);
 			
 			if (Utils.solutionExists(solutions, id)) {
-				Solution solution = Solution.loadById(id);
+				Solution solution = SolutionDao.loadById(id);
 				session.setAttribute("solution", solution);
 				
 				request.getRequestDispatcher("/WEB-INF/SolutionDetails.jsp").forward(request, response);

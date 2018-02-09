@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import pl.coderslab.dao.ExerciseDao;
+import pl.coderslab.dao.UserDao;
 import pl.coderslab.model.Exercise;
 import pl.coderslab.model.Solution;
 import pl.coderslab.model.User;
@@ -51,9 +53,9 @@ public class UserDetails extends HttpServlet {
 			id = Integer.parseInt(idString);
 			
 			if (Utils.userExists(users, id)) {
-				User user = User.loadById(id);
+				User user = UserDao.loadById(id);
 				session.setAttribute("user", user);
-				Solution[] solutions = Exercise.loadAllByUserId(id);
+				Solution[] solutions = ExerciseDao.loadAllByUserId(id);
 				session.setAttribute("userSolutions", solutions);
 
 				request.getRequestDispatcher("/WEB-INF/UserDetails.jsp").forward(request, response);

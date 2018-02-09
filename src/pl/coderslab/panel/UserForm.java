@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import pl.coderslab.dao.GroupDao;
 import pl.coderslab.model.Group;
 import pl.coderslab.util.Utils;
 
@@ -51,7 +52,7 @@ public class UserForm extends HttpServlet {
 				writer.append("Id must be positive value!<br>");
 				writer.append("<a href='UserAdmin'>Return</a>");
 			} else {
-				Group[] groups = Group.loadAllGroups();
+				Group[] groups = GroupDao.loadAllGroups();
 				if (!Utils.groupExists(groups, group) && group != 0) {
 					writer.append("Group doesn't exist!<br>");
 					writer.append("<a href='UserAdmin'>Return</a>");

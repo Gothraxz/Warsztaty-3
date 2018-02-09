@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import pl.coderslab.dao.GroupDao;
 import pl.coderslab.model.Group;
 import pl.coderslab.util.DbUtil;
 
@@ -40,7 +41,7 @@ public class AllGroups extends HttpServlet {
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
 		
-		Group[] allGroups = Group.loadAllGroups();
+		Group[] allGroups = GroupDao.loadAllGroups();
 		
 		if (allGroups == null ) {
 			writer

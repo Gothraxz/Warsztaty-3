@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import pl.coderslab.dao.GroupDao;
+import pl.coderslab.dao.UserDao;
 import pl.coderslab.model.Group;
 import pl.coderslab.model.User;
 
@@ -39,7 +41,7 @@ public class UserAdmin extends HttpServlet {
 		HttpSession session = request.getSession();
 		Writer writer = response.getWriter();
 		
-		User[] users = User.loadAllUsers();
+		User[] users = UserDao.loadAllUsers();
 
 		if (users == null ) {
 			writer
@@ -71,21 +73,22 @@ public class UserAdmin extends HttpServlet {
 		String groupId = request.getParameter("groupId");
 		String password = request.getParameter("password");
 		
-		Group group = Group.loadById(0);
+		Group group = GroupDao.loadById(0);
 		if (groupId != null && groupId != "") {
-			group = Group.loadById(Integer.parseInt(groupId));
+			group = GroupDao.loadById(Integer.parseInt(groupId));
 		}
 		
 		int id = Integer.parseInt(userId);
 		
 		User user;
+		UserDao ud = new UserDao();
 		if (id == 0) {
 			user = new User(userName, userEmail, group, password);
 			user.setPassword(password);
-			user.saveToDB();
+			ud.saveToDB(user);
 			doGet(request, response);
 		} else {
-			user = User.loadById(id);
+			user = UserDao.loadById(id);
 			
 			if (userName != null && userName != "") {
 				user.setUsername(userName);		
@@ -103,7 +106,7 @@ public class UserAdmin extends HttpServlet {
 				user.setPassword(password);
 			}
 		
-			user.saveToDB();
+			ud.saveToDB(user);
 			doGet(request, response);
 		}
 
